@@ -1,22 +1,25 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import type { Sticker } from "../data/stickers"; 
+import type { Sticker, SelectedSticker } from "../data/stickers"; 
 import { stickers } from "../data/stickers";     
 
 type Props = {
-  selectedStickers: Sticker[];
-  setSelectedStickers: React.Dispatch<React.SetStateAction<Sticker[]>>;
+  selectedStickers: SelectedSticker[];
+  setSelectedStickers: React.Dispatch<React.SetStateAction<SelectedSticker[]>>;
 };
 
 const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) => {
   const navigate = useNavigate();
 
   const handleSelect = (sticker: Sticker) => {
-    if (!selectedStickers.find((s) => s.code === sticker.code)) {
-      setSelectedStickers([...selectedStickers, sticker]);
-    } else {
-      // Si ya está seleccionado y vuelve a hacer click → lo quitamos
+    const exists = selectedStickers.find((s) => s.code === sticker.code);
+
+    if (exists) {
+      // si ya está → lo quitamos
       setSelectedStickers(selectedStickers.filter((s) => s.code !== sticker.code));
+    } else {
+      // si no está → lo agregamos con cantidad = 1
+      setSelectedStickers([...selectedStickers, { ...sticker, quantity: 1 }]);
     }
   };
 
@@ -42,7 +45,7 @@ const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) =>
                       className={`btn ${isSelected ? "btn-warning" : "btn-primary"}`}
                       onClick={() => handleSelect(sticker)}
                     >
-                      {isSelected ? "Seleccionado" : "Seleccionar"}
+                      {isSelected ? "Deseleccionar" : "Seleccionar"}
                     </button>
                   </div>
                 </div>
@@ -57,7 +60,7 @@ const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) =>
               className="btn btn-success"
               onClick={() => navigate("/checkout")}
             >
-              Adquirir ({selectedStickers.length})
+              Comprar Stickers Seleccionados ({selectedStickers.length})
             </button>
           </div>
         )}

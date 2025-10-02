@@ -1,21 +1,25 @@
-//import React, { useState } from "react";
 import { useState } from "react";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import HomePage from "./pages/HomePage";
 import CheckoutPage from "./pages/CheckoutPage";
-import type { Sticker } from "./data/stickers";
+import type { SelectedSticker } from "./data/stickers"; // 👈 importar el nuevo tipo
 
 function App() {
-  const [selectedStickers, setSelectedStickers] = useState<Sticker[]>([]);
+  // 👇 ahora el estado guarda SelectedSticker[]
+  const [selectedStickers, setSelectedStickers] = useState<SelectedSticker[]>([]);
 
   return (
     <Router>
       <Routes>
         <Route
           path="/"
-          element={<HomePage selectedStickers={selectedStickers} setSelectedStickers={setSelectedStickers} />}
+          element={
+            <HomePage
+              selectedStickers={selectedStickers}
+              setSelectedStickers={setSelectedStickers}
+            />
+          }
         />
         <Route
           path="/checkout"

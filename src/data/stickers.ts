@@ -4,6 +4,11 @@ export type Sticker = {
   desc: string;
 };
 
+export type SelectedSticker = Sticker & {
+  quantity: number;
+};
+
+
 export const stickers: Sticker[] = [
   { code: "STK001", img: "brilla.jpg", desc: "Sticker para que no pierdas la calma" },
   { code: "STK002", img: "brilla1.jpg", desc: "Sticker para que brilles donde quieras" },
