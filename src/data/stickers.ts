@@ -6,12 +6,12 @@ export type Sticker = {
 
 export const stickers: Sticker[] = [
   { code: "STK001", img: "brilla.jpg", desc: "Sticker para que no pierdas la calma" },
-  { code: "STK002", img: "brilla1.jpg", desc: "Sticker para que briller donde quieras" },
+  { code: "STK002", img: "brilla1.jpg", desc: "Sticker para que brilles donde quieras" },
   { code: "STK003", img: "calabera.jpg", desc: "Sticker para solo relajarte" },
   { code: "STK004", img: "calabera1.jpg", desc: "Sticker para solo relajarte" },
   { code: "STK005", img: "calabera2.jpg", desc: "hasta muerto floresco" },
   { code: "STK006", img: "calabera3.jpg", desc: "hasta muerto floresco" },
-  { code: "STK007", img: "calabera4.jpg", desc: "Sticker de solo relajate y ser timido" },
+  { code: "STK007", img: "calabera4.jpg", desc: "Sticker de solo relajate y se timido" },
   { code: "STK008", img: "calor.jpg", desc: "Sticker de Calenturiento pero con una florsita" },
   { code: "STK009", img: "chicapunk.jpg", desc: "Sticker - yo mando, tu no" },
   { code: "STK010", img: "conejoamarillo.jpg", desc: "Sticker de conejo amarillo?" },
