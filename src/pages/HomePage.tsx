@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import confetti from "canvas-confetti";  // 👈 importamos
 import type { Sticker, SelectedSticker } from "../data/stickers"; 
 import { stickers } from "../data/stickers";     
 
@@ -11,7 +12,7 @@ type Props = {
 const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) => {
   const navigate = useNavigate();
 
-  const handleSelect = (sticker: Sticker) => {
+  const handleSelect = (sticker: Sticker, e: React.MouseEvent<HTMLButtonElement>) => {
     const exists = selectedStickers.find((s) => s.code === sticker.code);
 
     if (exists) {
@@ -20,6 +21,19 @@ const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) =>
     } else {
       // si no está → lo agregamos con cantidad = 1
       setSelectedStickers([...selectedStickers, { ...sticker, quantity: 1 }]);
+
+      // 🎉 lanzar estrellitas SOLO al seleccionar
+      const rect = (e.target as HTMLElement).getBoundingClientRect();
+      confetti({
+        particleCount: 40,
+        spread: 60,
+        origin: { 
+          x: (rect.left + rect.width / 2) / window.innerWidth,
+          y: (rect.top + rect.height / 2) / window.innerHeight 
+        },
+        shapes: ["star"], // 👈 salen como estrellitas
+        colors: ["#ff0", "#ff69b4", "#00f", "#0f0"],
+      });
     }
   };
 
@@ -43,7 +57,7 @@ const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) =>
                     <p className="card-text">{sticker.desc}</p>
                     <button
                       className={`btn ${isSelected ? "btn-warning" : "btn-primary"}`}
-                      onClick={() => handleSelect(sticker)}
+                      onClick={(e) => handleSelect(sticker, e)} // 👈 paso el evento
                     >
                       {isSelected ? "Deseleccionar" : "Seleccionar"}
                     </button>

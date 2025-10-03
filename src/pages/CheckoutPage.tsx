@@ -219,8 +219,8 @@
 //==========================================================================
 import React, { useState, useRef } from "react";
 import type { SelectedSticker } from "../data/stickers";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2pdf from "html2pdf.js";
+import Swal from "sweetalert2"; // 👈 importamos SweetAlert2
 
 type Props = {
   selectedStickers: SelectedSticker[];
@@ -228,10 +228,11 @@ type Props = {
 
 const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
   const [stickers, setStickers] = useState<SelectedSticker[]>(
-    selectedStickers.map((s) => ({ ...s, quantity: 1 })) // todos inician con 1
+    selectedStickers.map((s) => ({ ...s, quantity: 1 }))
   );
 
   const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const total = stickers.reduce((acc, s) => acc + s.quantity, 0);
@@ -245,44 +246,59 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
     );
   };
 
-  const handleDownloadPDF = async () => {
-    alert("📥 Descargando PDF...");
-
+  // 📄 Descargar PDF sin cortar contenido
+  const handleDownloadPDF = () => {
     if (!pdfRef.current) return;
 
     const element = pdfRef.current;
-    const canvas = await html2canvas(element, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+    const opt = {
+      margin: 10,
+      filename: "compra_stickers.pdf",
+      image: { type: "jpeg" as const, quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" as const },
+    };
 
-    const margin = 10;
-    const imgWidth = pageWidth - margin * 2;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    html2pdf().from(element).set(opt).save();
+  };
 
-    if (imgHeight < pageHeight) {
-      pdf.addImage(imgData, "PNG", margin, 10, imgWidth, imgHeight);
-    } else {
-      let y = 10;
-      while (y < imgHeight) {
-        pdf.addImage(imgData, "PNG", margin, y * -1 + 10, imgWidth, imgHeight);
-        y += pageHeight;
-        if (y < imgHeight) pdf.addPage();
-      }
+  // ✅ Validar campos antes de finalizar
+  const validateForm = (): boolean => {
+    if (!nombre.trim()) {
+      Swal.fire("⚠️ Campo vacío", "Por favor ingresa tu nombre.", "warning");
+      return false;
     }
 
-    const fecha = new Date().toLocaleString("es-BO", {
-      dateStyle: "full",
-      timeStyle: "short",
+    if (!/^\d+$/.test(telefono)) {
+      Swal.fire("⚠️ Teléfono inválido", "El teléfono solo debe contener números.", "warning");
+      return false;
+    }
+
+    if (telefono.length < 8) {
+      Swal.fire("⚠️ Teléfono demasiado corto", "El teléfono debe tener al menos 8 dígitos.", "warning");
+      return false;
+    }
+
+    return true;
+  };
+
+  // ✅ Finalizar compra con validación
+  const handleFinishPurchase = () => {
+    if (!validateForm()) return;
+
+    Swal.fire({
+      title: "🎉 ¡Compra exitosa!",
+      text: "Tu compra se ha realizado con éxito. ¿Quieres descargar tu comprobante?",
+      icon: "success",
+      showCancelButton: true,
+      confirmButtonText: "📥 Descargar comprobante",
+      cancelButtonText: "Cerrar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDownloadPDF();
+      }
     });
-    pdf.setFontSize(10);
-    pdf.text(`Fecha de compra: ${fecha}`, margin, pageHeight - 10);
-
-    pdf.save("compra_stickers.pdf");
-
-    alert("✅ PDF descargado con éxito!");
   };
 
   return (
@@ -311,7 +327,10 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
                     min="1"
                     value={sticker.quantity}
                     onChange={(e) =>
-                      handleQuantityChange(sticker.code, parseInt(e.target.value))
+                      handleQuantityChange(
+                        sticker.code,
+                        parseInt(e.target.value)
+                      )
                     }
                     className="form-control w-50 mx-auto"
                   />
@@ -321,9 +340,7 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
           ))}
         </div>
 
-        <h4 style={{ marginTop: "20px" }}>
-          Total a pagar: {total} Bs
-        </h4>
+        <h4 style={{ marginTop: "20px" }}>Total a pagar: {total} Bs</h4>
 
         <div className="mt-3">
           <label>Nombre para el envío:</label>
@@ -334,10 +351,35 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
             onChange={(e) => setNombre(e.target.value)}
           />
         </div>
+
+        <div className="mt-3">
+          <label>Telefono:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
+            maxLength={15} // 👈 opcional, para no poner más de 15 dígitos
+          />
+        </div>
+
+        {/* 👇 Fecha de compra al final del PDF */}
+        <p style={{ marginTop: "40px", fontSize: "12px", textAlign: "right" }}>
+          Fecha de compra:{" "}
+          {new Date().toLocaleString("es-BO", {
+            dateStyle: "full",
+            timeStyle: "short",
+          })}
+        </p>
       </div>
 
       <div className="text-center mt-4">
-        <button className="btn btn-success me-2">Finalizar Compra</button>
+        {/* Finalizar compra con alerta */}
+        <button className="btn btn-success me-2" onClick={handleFinishPurchase}>
+          Finalizar Compra
+        </button>
+
+        {/* Descargar directo PDF */}
         <button className="btn btn-primary" onClick={handleDownloadPDF}>
           Descargar en PDF
         </button>
