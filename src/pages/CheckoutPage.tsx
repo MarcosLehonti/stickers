@@ -216,7 +216,8 @@
 // export default CheckoutPage;
 
 //==========================================================================
-//==========================================================================
+//=========================================
+
 import React, { useState, useRef } from "react";
 import type { SelectedSticker } from "../data/stickers";
 import html2pdf from "html2pdf.js";
@@ -256,8 +257,9 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
       margin: 10,
       filename: "compra_stickers.pdf",
       image: { type: "jpeg" as const, quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 1.5, useCORS: true },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" as const },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] }, // 👈 evita cortes
     };
 
     html2pdf().from(element).set(opt).save();
@@ -271,12 +273,20 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
     }
 
     if (!/^\d+$/.test(telefono)) {
-      Swal.fire("⚠️ Teléfono inválido", "El teléfono solo debe contener números.", "warning");
+      Swal.fire(
+        "⚠️ Teléfono inválido",
+        "El teléfono solo debe contener números.",
+        "warning"
+      );
       return false;
     }
 
     if (telefono.length < 8) {
-      Swal.fire("⚠️ Teléfono demasiado corto", "El teléfono debe tener al menos 8 dígitos.", "warning");
+      Swal.fire(
+        "⚠️ Teléfono demasiado corto",
+        "El teléfono debe tener al menos 8 dígitos.",
+        "warning"
+      );
       return false;
     }
 
@@ -301,44 +311,81 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
     });
   };
 
+  // 🔹 Dividir stickers en páginas de 6
+  const stickersPorPagina = 6;
+  const paginas = [];
+  for (let i = 0; i < stickers.length; i += stickersPorPagina) {
+    paginas.push(stickers.slice(i, i + stickersPorPagina));
+  }
+
   return (
     <div className="container-fluid py-5">
+      {/* 👇 Estilos para evitar cortes en PDF */}
+      <style>
+        {`
+          .card {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            -moz-column-break-inside: avoid;
+            margin-bottom: 20px;
+          }
+
+          .pdf-page {
+            page-break-after: always;
+            break-after: page;
+          }
+
+          .pdf-page:last-child {
+            page-break-after: auto;
+          }
+        `}
+      </style>
+
       <div ref={pdfRef} style={{ padding: "20px" }}>
         <h2 className="text-center mb-4">Stickers Seleccionados</h2>
 
-        <div className="row">
-          {stickers.map((sticker) => (
-            <div className="col-md-4 col-sm-6 mb-4" key={sticker.code}>
-              <div className="card h-100 shadow">
-                <img
-                  src={`/img/${sticker.img}`}
-                  className="card-img-top"
-                  alt={sticker.desc}
-                />
-                <div className="card-body text-center">
-                  <p>
-                    <b>Código:</b> {sticker.code}
-                  </p>
-                  <p>{sticker.desc}</p>
+        {/* 🔹 Mostrar stickers paginados de 6 en 6 */}
+        {paginas.map((pagina, pageIndex) => (
+          <div key={pageIndex} className="pdf-page">
+            <div className="row">
+              {pagina.map((sticker) => (
+                <div
+                  className="col-md-4 col-sm-6 mb-4 d-flex align-items-stretch"
+                  key={sticker.code}
+                >
+                  <div className="card h-100 shadow w-100">
+                    <img
+                      src={`/img/${sticker.img}`}
+                      className="card-img-top"
+                      alt={sticker.desc}
+                    />
+                    <div className="card-body text-center">
+                      <p>
+                        <b>Código:</b> {sticker.code}
+                      </p>
+                      <p>{sticker.desc}</p>
 
-                  {/* Input cantidad */}
-                  <input
-                    type="number"
-                    min="1"
-                    value={sticker.quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(
-                        sticker.code,
-                        parseInt(e.target.value)
-                      )
-                    }
-                    className="form-control w-50 mx-auto"
-                  />
+                      {/* Input cantidad */}
+                      <input
+                        type="number"
+                        min="1"
+                        value={sticker.quantity}
+                        onChange={(e) =>
+                          handleQuantityChange(
+                            sticker.code,
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="form-control w-50 mx-auto"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
 
         <h4 style={{ marginTop: "20px" }}>Total a pagar: {total} Bs</h4>
 
@@ -359,7 +406,7 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
             className="form-control"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
-            maxLength={15} // 👈 opcional, para no poner más de 15 dígitos
+            maxLength={15} // 👈 opcional
           />
         </div>
 
