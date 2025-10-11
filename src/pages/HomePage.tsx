@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import confetti from "canvas-confetti";  // 👈 importamos
 import type { Sticker, SelectedSticker } from "../data/stickers"; 
@@ -11,6 +11,19 @@ type Props = {
 
 const HomePage: React.FC<Props> = ({ selectedStickers, setSelectedStickers }) => {
   const navigate = useNavigate();
+
+  // ✅ Cargar stickers guardados en localStorage al iniciar
+  useEffect(() => {
+    const stored = localStorage.getItem("stickersSeleccionados");
+    if (stored) {
+      setSelectedStickers(JSON.parse(stored));
+    }
+  }, [setSelectedStickers]);
+
+  // ✅ Guardar los stickers seleccionados cada vez que cambian
+  useEffect(() => {
+    localStorage.setItem("stickersSeleccionados", JSON.stringify(selectedStickers));
+  }, [selectedStickers]);
 
   const handleSelect = (sticker: Sticker, e: React.MouseEvent<HTMLButtonElement>) => {
     const exists = selectedStickers.find((s) => s.code === sticker.code);
