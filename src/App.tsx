@@ -1,21 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import HomePage from "./pages/HomePage";
 import CheckoutPage from "./pages/CheckoutPage";
-import type { SelectedSticker } from "./data/stickers";
+import type { SelectedSticker } from "./data/stickers"; // 👈 importar el nuevo tipo
 
 function App() {
-  const [selectedStickers, setSelectedStickers] = useState<SelectedSticker[]>(() => {
-    // 👇 Leer desde localStorage al iniciar
-    const saved = localStorage.getItem("stickersSeleccionados");
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // 👇 Guardar automáticamente cada vez que cambie el estado
-  useEffect(() => {
-    localStorage.setItem("stickersSeleccionados", JSON.stringify(selectedStickers));
-  }, [selectedStickers]);
+  // 👇 ahora el estado guarda SelectedSticker[]
+  const [selectedStickers, setSelectedStickers] = useState<SelectedSticker[]>([]);
 
   return (
     <Router>

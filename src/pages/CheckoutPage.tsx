@@ -217,7 +217,8 @@
 
 //==========================================================================
 //=========================================
-import React, { useState, useRef, useEffect } from "react";
+
+import React, { useState, useRef } from "react";
 import type { SelectedSticker } from "../data/stickers";
 import html2pdf from "html2pdf.js";
 import Swal from "sweetalert2"; // 👈 importamos SweetAlert2
@@ -234,19 +235,6 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const pdfRef = useRef<HTMLDivElement>(null);
-
-  // ✅ Cargar stickers desde localStorage al montar
-  useEffect(() => {
-    const stored = localStorage.getItem("stickersSeleccionados");
-    if (stored) {
-      setStickers(JSON.parse(stored));
-    }
-  }, []);
-
-  // ✅ Guardar los stickers actualizados en localStorage
-  useEffect(() => {
-    localStorage.setItem("stickersSeleccionados", JSON.stringify(stickers));
-  }, [stickers]);
 
   const total = stickers.reduce((acc, s) => acc + s.quantity, 0);
 
@@ -412,7 +400,7 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
         </div>
 
         <div className="mt-3">
-          <label>Teléfono:</label>
+          <label>Telefono:</label>
           <input
             type="text"
             className="form-control"
