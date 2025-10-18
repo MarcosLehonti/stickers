@@ -1,220 +1,3 @@
-// import React, { useState, useRef } from "react";
-// import type { Sticker } from "../data/stickers";
-// import jsPDF from "jspdf";
-// import html2canvas from "html2canvas";
-
-// type Props = {
-//   selectedStickers: Sticker[];
-// };
-
-// const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
-//   const [nombre, setNombre] = useState("");
-//   const total = selectedStickers.length * 1; // 1 Bs por sticker
-
-//   // Referencia al contenido que exportaremos
-//   const pdfRef = useRef<HTMLDivElement>(null);
-
-//   const handleDownloadPDF = async () => {
-//     if (!pdfRef.current) return;
-
-//     const element = pdfRef.current;
-//     const canvas = await html2canvas(element, { scale: 2 });
-//     const imgData = canvas.toDataURL("image/png");
-
-//     const pdf = new jsPDF("p", "mm", "a4");
-//     const pageWidth = pdf.internal.pageSize.getWidth();
-//     const pageHeight = pdf.internal.pageSize.getHeight();
-
-//     // Márgenes para que no quede pegado a la derecha
-//     const margin = 10;
-//     const imgWidth = pageWidth - margin * 2;
-//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-//     let position = 10;
-
-//     if (imgHeight < pageHeight) {
-//       pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
-//     } else {
-//       let y = position;
-//       while (y < imgHeight) {
-//         pdf.addImage(imgData, "PNG", margin, y * -1 + position, imgWidth, imgHeight);
-//         y += pageHeight;
-//         if (y < imgHeight) pdf.addPage();
-//       }
-//     }
-
-//     // --- Agregar fecha al final del PDF ---
-//     const fecha = new Date().toLocaleString("es-BO", {
-//       dateStyle: "full",
-//       timeStyle: "short",
-//     });
-//     pdf.setFontSize(10);
-//     pdf.text(`Fecha de compra: ${fecha}`, margin, pageHeight - 10);
-
-//     pdf.save("compra_stickers.pdf");
-//   };
-
-//   return (
-//     <div className="container-fluid py-5">
-//       <div ref={pdfRef} style={{ padding: "20px" }}>
-//         <h2 className="text-center mb-4">Stickers Seleccionados</h2>
-
-//         <div className="row">
-//           {selectedStickers.map((sticker) => (
-//             <div className="col-md-4 col-sm-6 mb-4" key={sticker.code}>
-//               <div className="card h-100 shadow">
-//                 <img
-//                   src={`/img/${sticker.img}`}
-//                   className="card-img-top"
-//                   alt={sticker.desc}
-//                 />
-//                 <div className="card-body text-center">
-//                   <p><b>Código:</b> {sticker.code}</p>
-//                   <p>{sticker.desc}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-
-//         <h4 style={{ marginTop: "20px" }}>Total a pagar: {total} Bs</h4>
-
-//         <div className="mt-3">
-//           <label>Nombre para el envío:</label>
-//           <input
-//             type="text"
-//             className="form-control"
-//             value={nombre}
-//             onChange={(e) => setNombre(e.target.value)}
-//           />
-//         </div>
-//       </div>
-
-//       <div className="text-center mt-4">
-//         <button className="btn btn-success me-2">Finalizar Compra</button>
-//         <button className="btn btn-primary" onClick={handleDownloadPDF}>
-//           Descargar en PDF
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CheckoutPage;
-
-//================================================================================
-//================================================================================
-//================================================================================
-
-// import React, { useState, useRef } from "react";
-// import type { Sticker } from "../data/stickers";
-// import jsPDF from "jspdf";
-// import html2canvas from "html2canvas";
-
-// type Props = {
-//   selectedStickers: Sticker[];
-// };
-
-// const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
-//   const [nombre, setNombre] = useState("");
-//   const total = selectedStickers.length * 1; // 1 Bs por sticker
-
-//   // Referencia al contenido que exportaremos
-//   const pdfRef = useRef<HTMLDivElement>(null);
-
-//   const handleDownloadPDF = async () => {
-//     if (!pdfRef.current) return;
-
-//     const element = pdfRef.current;
-
-//     // 📉 Reducir resolución del canvas
-//     const canvas = await html2canvas(element, { scale: 1 });
-//     // 📉 Exportar como JPEG con compresión 50%
-//     const imgData = canvas.toDataURL("image/jpeg", 0.5);
-
-//     const pdf = new jsPDF("p", "mm", "a4");
-//     const pageWidth = pdf.internal.pageSize.getWidth();
-//     const pageHeight = pdf.internal.pageSize.getHeight();
-
-//     // Márgenes para que no quede pegado a la derecha
-//     const margin = 10;
-//     const imgWidth = pageWidth - margin * 2;
-//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-//     let position = 10;
-
-//     if (imgHeight < pageHeight) {
-//       pdf.addImage(imgData, "JPEG", margin, position, imgWidth, imgHeight);
-//     } else {
-//       let y = position;
-//       while (y < imgHeight) {
-//         pdf.addImage(imgData, "JPEG", margin, y * -1 + position, imgWidth, imgHeight);
-//         y += pageHeight;
-//         if (y < imgHeight) pdf.addPage();
-//       }
-//     }
-
-//     // --- Agregar fecha al final del PDF ---
-//     const fecha = new Date().toLocaleString("es-BO", {
-//       dateStyle: "full",
-//       timeStyle: "short",
-//     });
-//     pdf.setFontSize(10);
-//     pdf.text(`Fecha de compra: ${fecha}`, margin, pageHeight - 10);
-
-//     pdf.save("compra_stickers.pdf");
-//   };
-
-//   return (
-//     <div className="container-fluid py-5">
-//       <div ref={pdfRef} style={{ padding: "20px" }}>
-//         <h2 className="text-center mb-4">Stickers Seleccionados</h2>
-
-//         <div className="row">
-//           {selectedStickers.map((sticker) => (
-//             <div className="col-md-4 col-sm-6 mb-4" key={sticker.code}>
-//               <div className="card h-100 shadow">
-//                 <img
-//                   src={`/img/${sticker.img}`}
-//                   className="card-img-top"
-//                   alt={sticker.desc}
-//                 />
-//                 <div className="card-body text-center">
-//                   <p>
-//                     <b>Código:</b> {sticker.code}
-//                   </p>
-//                   <p>{sticker.desc}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-
-//         <h4 style={{ marginTop: "20px" }}>Total a pagar: {total} Bs</h4>
-
-//         <div className="mt-3">
-//           <label>Nombre para el envío:</label>
-//           <input
-//             type="text"
-//             className="form-control"
-//             value={nombre}
-//             onChange={(e) => setNombre(e.target.value)}
-//           />
-//         </div>
-//       </div>
-
-//       <div className="text-center mt-4">
-//         <button className="btn btn-success me-2">Finalizar Compra</button>
-//         <button className="btn btn-primary" onClick={handleDownloadPDF}>
-//           Descargar en PDF
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CheckoutPage;
-
 //==========================================================================
 //=========================================
 
@@ -248,22 +31,49 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
   };
 
   // 📄 Descargar PDF sin cortar contenido
-  const handleDownloadPDF = () => {
-    if (!pdfRef.current) return;
+  const handleDownloadPDF = async () => {
+  if (!pdfRef.current) return;
 
-    const element = pdfRef.current;
+  const element = pdfRef.current;
 
-    const opt = {
-      margin: 10,
-      filename: "compra_stickers.pdf",
-      image: { type: "jpeg" as const, quality: 0.98 },
-      html2canvas: { scale: 1.5, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" as const },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] }, // 👈 evita cortes
-    };
-
-    html2pdf().from(element).set(opt).save();
+  const opt = {
+    margin: 10,
+    filename: "compra_stickers.pdf",
+    image: { type: "jpeg" as const, quality: 0.98 },
+    html2canvas: { scale: 1.5, useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" as const },
+    pagebreak: { mode: ["avoid-all", "css", "legacy"] },
   };
+
+  // 🔹 Esperar a que se genere y descargue el PDF
+  await html2pdf().from(element).set(opt).save();
+
+  // 🔹 Luego de descargar, redirigir a WhatsApp
+  if (telefono.trim()) {
+    // Limpia el número quitando espacios y símbolos
+    const numeroLimpio = "59177678372";
+
+    // Mensaje prellenado
+    const mensaje = encodeURIComponent(
+      `Hola , acabo de realizar mi compra de stickers. Te envío mi comprobante en PDF que descargué.`
+    );
+
+    // URL de WhatsApp (funciona en web y móvil)
+    const whatsappURL = `https://wa.me/${numeroLimpio}?text=${mensaje}`;
+
+    // Redirigir después de unos segundos
+    setTimeout(() => {
+      window.open(whatsappURL, "_blank");
+    }, 1500);
+  } else {
+    Swal.fire(
+      "ℹ️ Sin número de teléfono",
+      "El comprobante se descargó correctamente, pero no hay número para enviar por WhatsApp.",
+      "info"
+    );
+  }
+};
+
 
   // ✅ Validar campos antes de finalizar
   const validateForm = (): boolean => {
