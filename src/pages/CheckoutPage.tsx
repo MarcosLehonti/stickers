@@ -31,7 +31,7 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
   };
 
   // 📄 Descargar PDF sin cortar contenido
-  const handleDownloadPDF = async () => {
+const handleDownloadPDF = async () => {
   if (!pdfRef.current) return;
 
   const element = pdfRef.current;
@@ -45,34 +45,31 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
     pagebreak: { mode: ["avoid-all", "css", "legacy"] },
   };
 
-  // 🔹 Esperar a que se genere y descargue el PDF
+  // 🔹 Esperar que se genere y descargue el PDF
   await html2pdf().from(element).set(opt).save();
 
-  // 🔹 Luego de descargar, redirigir a WhatsApp
-  if (telefono.trim()) {
-    // Limpia el número quitando espacios y símbolos
-    const numeroLimpio = "59177678372";
+  // 🔹 Después de la descarga, mostrar alerta
+  Swal.fire({
+    title: "✅ PDF con tus Stickers Generado",
+    text: "Ahora puedes enviar el PDF al siguiente WhatsApp para finalizar con la compra.",
+    icon: "info",
+    confirmButtonText: "📲 Enviar por WhatsApp",
+    showCancelButton: true,
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // 🔸 AQUÍ defines el número de WhatsApp de tu negocio
+      const numeroLimpio = "59177678372"; // 👈 tu número sin el "+"
+      const mensaje = encodeURIComponent(
+        `Hola 👋, soy ${nombre}. Acabo de realizar mi compra de stickers y descargué el comprobante en PDF.`
+      );
 
-    // Mensaje prellenado
-    const mensaje = encodeURIComponent(
-      `Hola , acabo de realizar mi compra de stickers. Te envío mi comprobante en PDF que descargué.`
-    );
-
-    // URL de WhatsApp (funciona en web y móvil)
-    const whatsappURL = `https://wa.me/${numeroLimpio}?text=${mensaje}`;
-
-    // Redirigir después de unos segundos
-    setTimeout(() => {
+      const whatsappURL = `https://wa.me/${numeroLimpio}?text=${mensaje}`;
       window.open(whatsappURL, "_blank");
-    }, 1500);
-  } else {
-    Swal.fire(
-      "ℹ️ Sin número de teléfono",
-      "El comprobante se descargó correctamente, pero no hay número para enviar por WhatsApp.",
-      "info"
-    );
-  }
+    }
+  });
 };
+
 
 
   // ✅ Validar campos antes de finalizar
@@ -108,8 +105,8 @@ const CheckoutPage: React.FC<Props> = ({ selectedStickers }) => {
     if (!validateForm()) return;
 
     Swal.fire({
-      title: "🎉 ¡Compra exitosa!",
-      text: "Tu compra se ha realizado con éxito. ¿Quieres descargar tu comprobante?",
+      title: "🎉 ¡Ya casi esta!",
+      text: "Para Terminar con tu compra Descarga tu Comprobante en PFD y sigue los siguientes pasos",
       icon: "success",
       showCancelButton: true,
       confirmButtonText: "📥 Descargar comprobante",
